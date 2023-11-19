@@ -424,6 +424,7 @@ return [
    'subtotal_editable' => 'Subtotal Editable',
    'subtotal_editable_help_text' => 'Check this to make Subtotal field editable for each product in POS screen',
    'notification_templates' => 'Notification Templates',
+   'inventory' => 'Inventory',
    'new_sale' => 'New Sale',
    'payment_reminder' => 'Payment Remider',
    'payment_received' => 'Payment Received',

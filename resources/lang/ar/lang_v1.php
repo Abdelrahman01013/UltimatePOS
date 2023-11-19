@@ -419,6 +419,7 @@ return [
 "subtotal_editable" => "تعديل المبلغ الاجمالى",
 "subtotal_editable_help_text" => "حدد هذا الخيار لجعل الحقل الإجمالي الفرعي قابلاً للتحرير لكل منتج في شاشة POS",
 "notification_templates" => "نماذج الإشعارات",
+"inventory" => "جرد",
 "new_sale" => "بيع جديد",
 "payment_reminder" => "اشعار مدفوعات",
 "payment_received" => "الدفعة المستلمة",
