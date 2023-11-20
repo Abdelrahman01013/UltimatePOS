@@ -746,7 +746,7 @@ class AdminSidebarMenu
 
             //Notification template menu
             if (auth()->user()->can('send_notifications')) {
-                $menu->url(action('NotificationTemplateController@index'), __('lang_v1.inventory'), ['icon' => 'fa fas fa-file-invoice', 'active' => request()->segment(1) == 'notification-templates'])->order(80);
+                $menu->url(action('InventoryController@index'), __('lang_v1.inventory'), ['icon' => 'fa fas fa-file-invoice', 'active' => request()->segment(1) == 'notification-templates'])->order(80);
             }
             
 

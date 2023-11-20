@@ -276,6 +276,17 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     //Customer Groups
     Route::resource('customer-group', 'CustomerGroupController');
 
+    // Inventory Routes
+    // Route::resource('inventory', 'InventoryController');
+
+    Route::group(['prefix'=>'inventory'], function() {
+        Route::get('/', 'InventoryController@index');
+        Route::get('inventory-by-location/{id}', 'InventoryController@inventoryByLocation')
+        ->name('inventory-by-location');
+    });
+
+
+
     //Import opening stock
     Route::get('/import-opening-stock', 'ImportOpeningStockController@index');
     Route::post('/import-opening-stock/store', 'ImportOpeningStockController@store');
