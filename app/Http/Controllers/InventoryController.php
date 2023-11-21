@@ -70,7 +70,13 @@ class InventoryController extends Controller
     }
 
     public function inventoryByLocation($id) {
-        return view('inventories.inventory-by-location');
+
+        $products = Product::with('product_locations')
+        ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
+        ->where('location_id', $id)
+        ->get();
+
+        return view('inventories.inventory-by-location')->with('products', $products);
     }
 
 
