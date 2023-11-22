@@ -279,12 +279,16 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     // Inventory Routes
     // Route::resource('inventory', 'InventoryController');
 
-    Route::group(['prefix'=>'inventory'], function() {
+    Route::group(['prefix' => 'inventory'], function () {
         Route::get('/', 'InventoryController@index');
         Route::get('inventory-by-location/{id}', 'InventoryController@inventoryByLocation')
-        ->name('inventory-by-location');
+            ->name('inventory-by-location');
         Route::post('search-for-products', 'InventoryController@searchForProducts')->name('inventory-search-for-products');
         Route::post('get-products', 'InventoryController@getProducts')->name('inventory-get-products');
+        Route::get('inventory_more/{id}', 'InventoryController@inventory_more')
+            ->name('inventory_more');
+        Route::get('inventory_less/{id}', 'InventoryController@inventory_less')
+            ->name('inventory_less');
     });
 
 
