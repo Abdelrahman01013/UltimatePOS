@@ -19,6 +19,8 @@ class CreateInventriesTable extends Migration
 
             $table->unsignedInteger('product_id');
             $table->unsignedInteger('location_id');
+            $table->integer('current_quantity');
+            $table->integer('finded_quantity');
             $table->integer('dif');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('location_id')->references('id')->on('business_locations')->onDelete('cascade');
