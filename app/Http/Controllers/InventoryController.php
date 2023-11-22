@@ -70,13 +70,7 @@ class InventoryController extends Controller
     }
 
     public function inventoryByLocation($id) {
-
-        $products = Product::with('product_locations')
-        ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
-        ->where('location_id', $id)
-        ->get();
-
-        return view('inventories.inventory-by-location')->with('products', $products);
+        return view('inventories.inventory-by-location');
     }
 
 
@@ -92,14 +86,45 @@ class InventoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    * Store a newly created resource in storage.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\Response
+    */
+
+    
+
+    public function searchForProducts(Request $request)
     {
-        //
+        $search_word = $request->search_word;
+        $search_word_length = strlen($search_word);
+        $id = substr(url()->previous(), -1);
+
+        if($search_word) {
+            // $products = Product::with('product_locations')
+            // ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
+            // ->where('location_id', $id)
+            // ->whereRaw("SUBSTRING(name, 1, $search_word_length) = ?", $search_word)
+            // ->get();
+
+            $products = Product::with('product_locations')
+            ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
+            ->where('location_id', $id)
+            ->where('products.name', 'LIKE', '%'. $search_word. '%')
+            ->select('id', 'name')
+            ->get();
+
+
+            return response()->json($products);
+        }
+        
+    }
+    
+    public function getProducts(Request $request)
+    {
+        $product = Product::find($request->id);
+        
+        return response()->json($product);
     }
 
     /**
