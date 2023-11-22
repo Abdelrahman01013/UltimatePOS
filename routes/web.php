@@ -283,6 +283,8 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
         Route::get('/', 'InventoryController@index');
         Route::get('inventory-by-location/{id}', 'InventoryController@inventoryByLocation')
         ->name('inventory-by-location');
+        Route::post('search-for-products', 'InventoryController@searchForProducts')->name('inventory-search-for-products');
+        Route::post('get-products', 'InventoryController@getProducts')->name('inventory-get-products');
     });
 
 
