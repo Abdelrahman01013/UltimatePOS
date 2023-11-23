@@ -2,68 +2,112 @@
 @section('title', __('lang_v1.inventory'))
 
 
+
 @section('content')
 
-    <div class="container">
-        <h2 class="text-center">مخزن فرع القاهره</h2>
-        <input class="form-control" id="myInput" type="text" placeholder="البحث باستخدام الأسم او الباركود">
-        <br>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>الباركود</th>
-                    <th>اسم المنتج</th>
-                    <th>الكميه المتاحه</th>
-                    <th>الفارق</th>
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>@lang('الجرد')
+            <small>@lang('عجز')</small>
+        </h1>
+        <!-- <ol class="breadcrumb">
+                                                                                                                                                                                                                                                                                                                                                        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+                                                                                                                                                                                                                                                                                                                                                        <li class="active">Here</li>
+                                                                                                                                                                                                                                                                                                                                                    </ol> -->
+    </section>
 
-                    <th>تاريخ الجرد</th>
-                </tr>
-            </thead>
-            <tbody id="myTable">
-                <tr>
-                    <td>002</td>
-                    <td>طبق</td>
-                    <td>2500</td>
-                    <td class="text-danger">-20</td>
-
-                    <td>22-5-2023</td>
-                </tr>
-                <tr>
-                    <td>003</td>
-                    <td>كوب</td>
-                    <td>2500</td>
-                    <td class="text-danger">-15</td>
-
-                    <td>22-5-2023</td>
-                </tr>
-                <tr>
-                    <td>003</td>
-                    <td>كوب</td>
-                    <td>2500</td>
-                    <td class="text-danger">-80</td>
-                    <td>22-10-2023</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <!-- Main content -->
+    <section class="content">
+        @component('components.widget', ['class' => 'box-primary', 'title' => __('')])
 
 
+            @can('user.view')
+                <div class="table-responsive">
 
+                    <table class="table table-bordered table-striped" id="inventory_table">
+                        <thead>
+                            <tr>
+                                <th>الباركود</th>
+                                <th>اسم المنتج</th>
 
+                                <th>الكميه عند الجرد</th>
+
+                                <th>الكميه في المخز</th>
+
+                                <th>الفارق</th>
+                                <th>الكميه الان</th>
+                                <th>وقت الجرد</th>
+                                <th>@lang('messages.action')</th>
+                            </tr>
+                        </thead>
+                        @foreach ($inventory as $inv)
+                            <tr>
+
+                                <th> {{ $inv->product->sku }}</th>
+                                <th> {{ $inv->product->name }}</th>
+
+                                <th> {{ $inv->current_quantity }}</th>
+
+                                <th> {{ $inv->finded_quantity }}</th>
+                                <th class="text-danger"> {{ $inv->dif }}</th>
+                                <th> {{ $inv->product->alert_quantity }}</th>
+
+                                <th> {{ $inv->created_at }}</th>
+                                <th><a class="btn btn-primary" href="#"
+                                        onclick='return confirm("هل انت متاكد من عدم جرد " + "{{ $inv->product->name }}" + "?")'>
+                                        عدم الجرد </a> </th>
+                            </tr>
+                        @endforeach
+                    </table>
+                </div>
+            @endcan
+        @endcomponent
+
+        <div class="modal fade user_modal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
+        </div>
+
+    </section>
+    <!-- /.content -->
 @stop
-
 @section('javascript')
+    <script type="text/javascript">
+        //Roles table
 
-    <script>
-        $(document).ready(function() {
-            $("#myInput").on("keyup", function() {
-                var value = $(this).val().toLowerCase();
-                $("#myTable tr").filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                });
+
+
+        $(document).on('click', 'button.delete_user_button', function() {
+            swal({
+                title: LANG.sure,
+                text: LANG.confirm_delete_user,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    var href = $(this).data('href');
+                    var data = $(this).serialize();
+                    $.ajax({
+                        method: "DELETE",
+                        url: href,
+                        dataType: "json",
+                        data: data,
+                        success: function(result) {
+                            if (result.success == true) {
+                                toastr.success(result.msg);
+                                users_table.ajax.reload();
+                            } else {
+                                toastr.error(result.msg);
+                            }
+                        }
+                    });
+                }
             });
         });
     </script>
 
-
+    <script>
+        $(document).ready(function() {
+            $('#inventory_table').DataTable();
+        });
+    </script>
 @endsection

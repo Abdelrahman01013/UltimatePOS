@@ -8,12 +8,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>@lang('الجرد')
-            <small>@lang('عجز')</small>
+            <small>@lang('التقارير')</small>
         </h1>
         <!-- <ol class="breadcrumb">
-                                                                                                                                                                                                                                                                                                                                                                                            <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-                                                                                                                                                                                                                                                                                                                                                                                            <li class="active">Here</li>
-                                                                                                                                                                                                                                                                                                                                                                                        </ol> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                    <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+                                                                                                                                                                                                                                                                                                                                                                                                                    <li class="active">Here</li>
+                                                                                                                                                                                                                                                                                                                                                                                                                </ol> -->
     </section>
 
     <!-- Main content -->
@@ -49,7 +49,15 @@
                                 <th> {{ $inv->current_quantity }}</th>
 
                                 <th> {{ $inv->finded_quantity }}</th>
-                                <th class="text-success"> {{ $inv->dif }}</th>
+
+                                @if ($inv->dif > 0)
+                                    <th class="text-success"> {{ $inv->dif }}</th>
+                                @else
+                                    <th class="text-danger"> {{ $inv->dif }}</th>
+                                @endif
+
+
+
                                 <th> {{ $inv->product->alert_quantity }}</th>
 
                                 <th> {{ $inv->created_at }}</th>

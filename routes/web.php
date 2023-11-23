@@ -289,6 +289,8 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
             ->name('inventory_more');
         Route::get('inventory_less/{id}', 'InventoryController@inventory_less')
             ->name('inventory_less');
+        Route::get('inventory_reprts/{id}', 'InventoryController@inventory_reprts')
+            ->name('inventory_reprts');
     });
 
 

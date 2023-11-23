@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Inventory extends Model
 {
-    
+
 
     // use SoftDeletes;
 
@@ -16,8 +16,8 @@ class Inventory extends Model
      * @var array
      */
     protected $guarded = ['id'];
-    
-    
+
+
 
     /**
      * Get the business that owns the user.
@@ -58,14 +58,14 @@ class Inventory extends Model
     public static function create_user($details)
     {
         $user = User::create([
-                    'surname' => $details['surname'],
-                    'first_name' => $details['first_name'],
-                    'last_name' => $details['last_name'],
-                    'username' => $details['username'],
-                    'email' => $details['email'],
-                    'password' => Hash::make($details['password']),
-                    'language' => !empty($details['language']) ? $details['language'] : 'en'
-                ]);
+            'surname' => $details['surname'],
+            'first_name' => $details['first_name'],
+            'last_name' => $details['last_name'],
+            'username' => $details['username'],
+            'email' => $details['email'],
+            'password' => Hash::make($details['password']),
+            'language' => !empty($details['language']) ? $details['language'] : 'en'
+        ]);
 
         return $user;
     }
@@ -104,7 +104,7 @@ class Inventory extends Model
     public static function can_access_this_location($location_id, $business_id = null)
     {
         $permitted_locations = auth()->user()->permitted_locations($business_id);
-        
+
         if ($permitted_locations == 'all' || in_array($location_id, $permitted_locations)) {
             return true;
         }
@@ -123,10 +123,9 @@ class Inventory extends Model
                 $permissions[] = 'location.' . $location_id;
             }
 
-            return $query->whereHas('permissions', function($q) use ($permissions) {
+            return $query->whereHas('permissions', function ($q) use ($permissions) {
                 $q->whereIn('permissions.name', $permissions);
             });
-
         } else {
             return $query;
         }
@@ -144,8 +143,8 @@ class Inventory extends Model
     public static function forDropdown($business_id, $prepend_none = true, $include_commission_agents = false, $prepend_all = false, $check_location_permission = false)
     {
         $query = User::where('business_id', $business_id)
-                    ->user();
-                    
+            ->user();
+
         if (!$include_commission_agents) {
             $query->where('is_cmmsn_agnt', 0);
         }
@@ -166,23 +165,23 @@ class Inventory extends Model
         if ($prepend_all) {
             $users = $users->prepend(__('lang_v1.all'), '');
         }
-        
+
         return $users;
     }
 
     /**
-    * Return list of sales commission agents dropdown for a business
-    *
-    * @param $business_id int
-    * @param $prepend_none = true (boolean)
-    *
-    * @return array users
-    */
+     * Return list of sales commission agents dropdown for a business
+     *
+     * @param $business_id int
+     * @param $prepend_none = true (boolean)
+     *
+     * @return array users
+     */
     public static function saleCommissionAgentsDropdown($business_id, $prepend_none = true)
     {
         $all_cmmsn_agnts = User::where('business_id', $business_id)
-                        ->where('is_cmmsn_agnt', 1)
-                        ->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"));
+            ->where('is_cmmsn_agnt', 1)
+            ->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"));
 
         $users = $all_cmmsn_agnts->pluck('full_name', 'id');
 
@@ -206,7 +205,7 @@ class Inventory extends Model
     public static function allUsersDropdown($business_id, $prepend_none = true, $prepend_all = false)
     {
         $all_users = User::where('business_id', $business_id)
-                        ->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"));
+            ->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"));
 
         $users = $all_users->pluck('full_name', 'id');
 
@@ -242,7 +241,7 @@ class Inventory extends Model
     {
         $user = User::findOrFail($user_id);
 
-        return (boolean)$user->selected_contacts;
+        return (bool)$user->selected_contacts;
     }
 
     public function getRoleNameAttribute()
@@ -276,7 +275,13 @@ class Inventory extends Model
         return $this->belongsTo(\Modules\Crm\Entities\CrmContact::class, 'crm_contact_id');
     }
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 
-
-
+    public function location()
+    {
+        return $this->belongsTo(BusinessLocation::class);
+    }
 }

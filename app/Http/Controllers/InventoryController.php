@@ -4,8 +4,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Business;
 use App\BusinessLocation;
 use App\Contact;
+use App\Inventory;
 use App\Product;
 use App\System;
 use App\User;
@@ -54,8 +56,12 @@ class InventoryController extends Controller
                         <a href="{{action(\'InventoryController@inventoryByLocation\', [$id])}}" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> @lang("lang_v1.inventory")</a>
                         &nbsp;
                     @endcan
+                    @can("user.inventory_reprts")
+                        <a href="{{action(\'InventoryController@inventory_reprts\', [$id])}}" class="btn btn-xs btn-info"><i class="fa fa-eye"></i></i> @lang("التقارير")</a>
+                        &nbsp;
+                    @endcan
                     @can("user.more")
-                        <a href="{{action(\'InventoryController@inventory_more\', [$id])}}" class="btn btn-xs btn-info"><i class="fa fa-eye"></i></i> @lang("تقارير الزياده")</a>
+                        <a href="{{action(\'InventoryController@inventory_more\', [$id])}}" class="btn btn-xs btn-success"><i class="fa fa-eye"></i></i> @lang("تقارير الزياده")</a>
                         &nbsp;
                     @endcan
                     @can("user.less")
@@ -75,10 +81,8 @@ class InventoryController extends Controller
         return view('inventories.index');
     }
 
-<<<<<<< HEAD
-    public function inventoryByLocation($id) {
-        return view('inventories.inventory-by-location');
-=======
+
+
     public function inventoryByLocation($id)
     {
 
@@ -88,32 +92,31 @@ class InventoryController extends Controller
             ->get();
 
         return view('inventories.inventory-by-location')->with('products', $products);
->>>>>>> Abdo
     }
 
 
     public function inventory_more($id)
     {
 
-        $products = Product::with('product_locations')
-            ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
-            ->where('location_id', $id)
-            ->get();
+        $inventory = Inventory::with('product', 'location')->where('location_id', $id)->where('dif', ">", 0)->get();
 
-        return view('inventories.more')->with('products', $products);
+        return view('inventories.more', compact('inventory'));
+    }
+    public function inventory_reprts($id)
+    {
+
+        $inventory = Inventory::with('product', 'location')->where('location_id', $id)->get();
+
+        return view('inventories.inventory', compact('inventory'));
     }
 
 
 
     public function inventory_less($id)
     {
+        $inventory = Inventory::with('product', 'location')->where('location_id', $id)->where('dif', "<", 0)->get();
 
-        $products = Product::with('product_locations')
-            ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
-            ->where('location_id', $id)
-            ->get();
-
-        return view('inventories.less')->with('products', $products);
+        return view('inventories.less', compact('inventory'));
     }
 
 
@@ -129,13 +132,13 @@ class InventoryController extends Controller
     }
 
     /**
-    * Store a newly created resource in storage.
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @return \Illuminate\Http\Response
-    */
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
 
-    
+
 
     public function searchForProducts(Request $request)
     {
@@ -143,7 +146,7 @@ class InventoryController extends Controller
         $search_word_length = strlen($search_word);
         $id = substr(url()->previous(), -1);
 
-        if($search_word) {
+        if ($search_word) {
             // $products = Product::with('product_locations')
             // ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
             // ->where('location_id', $id)
@@ -151,22 +154,21 @@ class InventoryController extends Controller
             // ->get();
 
             $products = Product::with('product_locations')
-            ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
-            ->where('location_id', $id)
-            ->where('products.name', 'LIKE', '%'. $search_word. '%')
-            ->select('id', 'name')
-            ->get();
+                ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
+                ->where('location_id', $id)
+                ->where('products.name', 'LIKE', '%' . $search_word . '%')
+                ->select('id', 'name')
+                ->get();
 
 
             return response()->json($products);
         }
-        
     }
-    
+
     public function getProducts(Request $request)
     {
         $product = Product::find($request->id);
-        
+
         return response()->json($product);
     }
 
