@@ -285,6 +285,9 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
         ->name('inventory-by-location');
         Route::post('search-for-products', 'InventoryController@searchForProducts')->name('inventory-search-for-products');
         Route::post('get-products', 'InventoryController@getProducts')->name('inventory-get-products');
+        Route::post('make', 'InventoryController@makeInventory')->name('inventory-make');
+        Route::post('store', 'InventoryController@storeInventory')->name('inventory-store');
+        Route::post('remove', 'InventoryController@removeInventory')->name('inventory-remove');
     });
 
 

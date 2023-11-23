@@ -7,8 +7,20 @@
         
         <div class="card">
             
-            <div style="margin-bottom: 30px" class="card-header">
+            <div style="margin-bottom: 30px;display: flex; justify-content:space-between; align-items:center" class="card-header d-flex flex-row">
                 <h2 class="">جرد المخازن</h2>
+                <form method="post" action="" enctype="multipart/form-data" >
+                @csrf
+                    @php 
+                        $active = empty(session()->get('inventory'));
+                    @endphp
+                    <button @if($active) disabled @endif type="button" id="remove-inventories" class="btn btn-danger mt-2" >
+                        <i style="margin-left: 5px" class="glyphicon glyphicon-trash" ></i>مسح عمليات الجرد
+                    </button>
+                    <button @if($active) disabled @endif type="button" id="store-inventories" class="btn btn-primary mt-2" >
+                        <i style="margin-left: 5px" class="fas fa-save"></i>حفظ و تسوية
+                    </button>
+                </form>
             </div>
 
             <div class="card-body">
@@ -39,16 +51,17 @@
                 <form method="post" action="" enctype="multipart/form-data" >
                     @csrf
                     <div class="row" >
+                        <input type="hidden" id='product-id' value="">
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">إسم المنتج</label>
-                                <input  type="text" class="form-control" id="product-name" aria-describedby="emailHelp" placeholder=". . .">
+                                <input readonly type="text" class="form-control" id="product-name" aria-describedby="emailHelp" placeholder=". . .">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">الكمية الحالية</label>
-                                <input type="number" class="form-control" id="current-quantity" aria-describedby="emailHelp" placeholder=". . .">
+                                <input readonly type="number" class="form-control" id="current-quantity" aria-describedby="emailHelp" placeholder=". . .">
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -65,13 +78,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">الفارق</label>
-                                <input disabled type="text" class="form-control" id="different-quantity" aria-describedby="emailHelp" placeholder=". . .">
+                                <input readonly type="text" class="form-control" id="different-quantity" aria-describedby="emailHelp" placeholder=". . .">
                             </div>
                         </div>
-                        <div style="margin-top: 24px" class="col-md-3">
+                        <div style="margin-top: 24px" class="col-md-6">
                             <div class="form-group">
-                                <input type="button" value="جرد" class="btn btn-primary" id="save" aria-describedby="emailHelp" placeholder=". . .">
-                                <input type="button" value="حفظ و تسوية" class="btn btn-primary" id="save" aria-describedby="emailHelp" placeholder=". . .">
+                                <button type="button" id="save" class="btn btn-primary inventoryAction" >
+                                    <i style="margin-left: 5px" class="fa fas fa-file-invoice" ></i>جرد
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -79,60 +93,32 @@
                     <br>
                     <br>
 
-                    <table style="width: 80%" class="table text-center">
-                        <thead>
-                            <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">إسم المنتج</th>
-                            <th scope="col">الكمية الحالية</th>
-                            <th scope="col">الكمية الموجودة</th>
-                            <th scope="col">الفارق</th>
-                            <th scope="col">حذف</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                            <td>@mdo</td>
-                            <td>
-                                <button class="btn btn-danger" >Delete</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@fat</td>
-                            <td>@fat</td>
-                            <td>
-                                <button class="btn btn-danger" >Delete</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@fat</td>
-                            <td>@fat</td>
-                            <td>
-                                <button class="btn btn-danger" >Delete</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td>Larry</td>
-                            <td>the Bird</td>
-                            <td>@twitter</td>
-                            <td>@twitter</td>
-                            <td>
-                                <button class="btn btn-danger" >Delete</button>
-                            </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    @if(!empty(session()->get('inventory')))
+
+                        <table id="inventories-table" style="width: 80%" class="table text-center">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">إسم المنتج</th>
+                                    <th scope="col">الكمية الحالية</th>
+                                    <th scope="col">الكمية الموجودة</th>
+                                    <th scope="col">الفارق</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventories-items" >
+                                
+                                @foreach($session_inventories as $inventory)
+                                    <tr id="inventories-item" >
+                                        <th scope="row">{{$loop->iteration++}}</th>
+                                        <td>{{ $inventory['product_name'] }}</td>
+                                        <td>{{ $inventory['current_quantity'] }}</td>
+                                        <td>{{ $inventory['finded_quantity'] }}</td>
+                                        <td>{{ $inventory['difference_quantity'] }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
 
 
                 </form>
@@ -186,6 +172,7 @@
                                     'id': $(this).attr('name'),
                                 },
                                 success: function(data) {
+                                    $("#product-id").val(data.id);
                                     $("#product-name").val(data.name);
                                     $("#current-quantity").val(data.alert_quantity);
 
@@ -200,6 +187,12 @@
                                 }
                             });
                         });
+
+
+                        
+
+
+
 
                         $("#finded-quantity").on("keyup", function() {
                             if($(this).val() != '') {
@@ -222,6 +215,92 @@
             
             
         });
+
+        $('.inventoryAction').on('click', function() {
+            
+            if($("#product-name").val() != '') {
+                $.ajax({
+                    type: 'post',
+                    enctype: 'multipart/form-data',
+                    url: "{{route('inventory-make')}}",
+                    data: {
+                        'product_id': $("#product-id").val(),
+                        'product_name': $("#product-name").val(),
+                        'current_quantity': $("#current-quantity").val(),
+                        'finded_quantity': $("#finded-quantity").val(),
+                        'difference_quantity': $("#different-quantity").val(),
+                        'request_status': $(this).attr('name'),
+                    },
+                    success: function(data) {
+                        $('#inventories-items').empty();
+                        $("#inventories-table").css('visibility', 'visible');
+                        $.each(data, function( index, inventory ) {
+                            index++;
+                            var item = "<tr id=\"inventories-item\" ><th scope=\"row\">"+index+"</th><td>"+inventory.product_name+"</td><td>"+inventory.current_quantity+"</td><td>"+inventory.finded_quantity+"</td><td>"+inventory.difference_quantity+"</td></tr>"
+                            $('#inventories-items').append(item);
+                        });
+
+                        $("#product-name").val('');
+                        $("#current-quantity").val('');
+                        $("#finded-quantity").val('');
+                        $("#different-quantity").val('');
+
+                        $("#remove-inventories").prop("disabled", false);
+                        $("#save-inventories").prop("disabled", false);
+
+                        // console.log() make page reload just one time
+
+                        location.reload();
+
+
+                    }, error: function(reject) {
+                    }
+                });
+            }
+
+        });
+
+        $('#remove-inventories').on('click', function() {
+
+            $.ajax({
+                type: 'post',
+                enctype: 'multipart/form-data',
+                url: "{{route('inventory-remove')}}",
+                data: {
+                    '': '',
+                },
+                success: function(data) {
+                    $("#inventories-table").css('visibility', 'hidden');
+                    $("#remove-inventories").prop("disabled", true);
+                    $("#store-inventories").prop("disabled", true);
+
+                }, error: function(reject) {}
+            });
+
+
+        });
+
+        $('#store-inventories').on('click', function() {
+
+            $.ajax({
+                type: 'post',
+                enctype: 'multipart/form-data',
+                url: "{{route('inventory-store')}}",
+                data: {
+                    '': '',
+                },
+                success: function(data) {
+                    $("#inventories-table").css('visibility', 'hidden');
+                    $("#remove-inventories").prop("disabled", true);
+                    $("#store-inventories").prop("disabled", true);
+
+                }, error: function(reject) {}
+            });
+
+
+        });
+
+
 
 
     </script>
