@@ -11,6 +11,8 @@
 |
 */
 
+use App\Http\Controllers\InventoryController;
+
 include_once('install_r.php');
 
 Route::middleware(['setData'])->group(function () {
@@ -277,7 +279,7 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::resource('customer-group', 'CustomerGroupController');
 
     // Inventory Routes
-    // Route::resource('inventory', 'InventoryController');
+    Route::resource('inventory', 'InventoryController');
 
     Route::group(['prefix' => 'inventory'], function () {
         Route::get('/', 'InventoryController@index');
@@ -285,12 +287,22 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
             ->name('inventory-by-location');
         Route::post('search-for-products', 'InventoryController@searchForProducts')->name('inventory-search-for-products');
         Route::post('get-products', 'InventoryController@getProducts')->name('inventory-get-products');
+
         Route::get('inventory_more/{id}', 'InventoryController@inventory_more')
             ->name('inventory_more');
+
         Route::get('inventory_less/{id}', 'InventoryController@inventory_less')
             ->name('inventory_less');
+
         Route::get('inventory_reprts/{id}', 'InventoryController@inventory_reprts')
             ->name('inventory_reprts');
+
+        // Route::delete('delete_inventory/{id}', 'InvoiceSchemeController@destroy')->name('delete_inventory');
+
+
+        Route::post('make', 'InventoryController@makeInventory')->name('inventory-make');
+        Route::post('store', 'InventoryController@storeInventory')->name('inventory-store');
+        Route::post('remove', 'InventoryController@removeInventory')->name('inventory-remove');
     });
 
 

@@ -11,9 +11,9 @@
             <small>@lang('عجز')</small>
         </h1>
         <!-- <ol class="breadcrumb">
-                                                                                                                                                                                                                                                                                                                                                                                            <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-                                                                                                                                                                                                                                                                                                                                                                                            <li class="active">Here</li>
-                                                                                                                                                                                                                                                                                                                                                                                        </ol> -->
+                                                                                                                                                                                                                                                                                                                                                                                                    <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+                                                                                                                                                                                                                                                                                                                                                                                                    <li class="active">Here</li>
+                                                                                                                                                                                                                                                                                                                                                                                                </ol> -->
     </section>
 
     <!-- Main content -->
@@ -49,15 +49,23 @@
                                 <th> {{ $inv->current_quantity }}</th>
 
                                 <th> {{ $inv->finded_quantity }}</th>
-                                <th class="text-success"> {{ $inv->dif }}</th>
+                                <th class="text-success"> {{ $inv->difference_quantity }}</th>
                                 <th> {{ $inv->product->alert_quantity }}</th>
 
                                 <th> {{ $inv->created_at }}</th>
                                 <th>
-                                    <a class="btn btn-primary" href="#"
-                                        onclick='return confirm("هل انت متاكد من عدم جرد " + "{{ $inv->product->name }}" + "?")'>
-                                        عدم الجرد
-                                    </a>
+                                    <form action="{{ route('inventory.destroy', $inv->id) }}" method="post">
+                                        @csrf
+                                        @method('DELETE')
+
+
+
+
+                                        <button class="btn btn-primary"
+                                            onclick='return confirm("هل انت متاكد من عدم جرد " + "{{ $inv->product->name }}" + "?")'>
+                                            عدم الجرد
+                                        </button>
+                                    </form>
                                 </th>
                             </tr>
                         @endforeach
