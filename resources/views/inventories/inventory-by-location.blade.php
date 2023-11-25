@@ -178,11 +178,11 @@
                                     'id': $(this).attr('name'),
                                 },
                                 success: function(data) {
+                                    
 
-
-                                    $("#product-id").val(data.id);
-                                    $("#product-name").val(data.name);
-                                    $("#current-quantity").val(data.purchase_lines[0].quantity);
+                                    $("#product-id").val(data.product.id);
+                                    $("#product-name").val(data.product.name);
+                                    $("#current-quantity").val(data.quantity);
 
                                     $('.list-group').empty();
                                     $('.list-group').css('display', 'none');
