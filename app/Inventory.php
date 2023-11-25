@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class Inventory extends Model
 {
@@ -19,12 +21,9 @@ class Inventory extends Model
 
 
 
-    /**
-     * Get the business that owns the user.
-     */
-    public function business()
+    public function product()
     {
-        return $this->belongsTo(\App\Business::class);
+        return $this->belongsTo(\App\Product::class);
     }
 
     public function scopeUser($query)
@@ -275,10 +274,10 @@ class Inventory extends Model
         return $this->belongsTo(\Modules\Crm\Entities\CrmContact::class, 'crm_contact_id');
     }
 
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
+    // public function product()
+    // {
+    //     return $this->belongsTo(Product::class);
+    // }
 
     public function location()
     {

@@ -43,9 +43,18 @@
                         <div class="col-md-6">
                             <label for="exampleInputEmail1">آخر منتج تم جرده</label>
                             <div class="input-group">
+                                @php
+                                    if (isset($last_inventory)) {
+                                        $last_inventory = $last_inventory['date'] . ' / ' . $last_inventory['name'];
+                                    } else {
+                                        $last_inventory = '';
+                                    }
+                                @endphp
                                 <span class="input-group-addon" id="basic-addon1"><i class="fas fa-clock"></i></span>
                                 <input type="text" class="form-control" placeholder=". . ."
                                     aria-describedby="basic-addon1">
+                                <input readonly value="{{ $last_inventory }}" type="text" class="form-control"
+                                    placeholder=". . ." aria-describedby="basic-addon1">
                             </div>
                         </div>
                     </div>
@@ -69,6 +78,9 @@
                                 <label for="exampleInputEmail1">الكمية الحالية</label>
                                 <input readonly type="number" class="form-control" id="current-quantity"
                                     aria-describedby="emailHelp" placeholder=". . .">
+                                <label for="exampleInputEmail1">الكمية الحالية ( المسجلة )</label>
+                                <input readonly type="number" class="form-control" id="current-quantity"
+                                    aria-describedby="emailHelp" placeholder=". . .">
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -82,57 +94,60 @@
                         <div style="margin-top: 30px" class="col-md-3">
                             <span style="padding: 7px; border-radius: 5px" class="bg-success">هذا المنتج تم جرده من
                                 قبل</span>
-                        </div>
+                            <div id="is-inventory-exist" style="margin-top: 30px;visibility:hidden" class="col-md-3">
+                                <span style="padding: 7px; border-radius: 5px;font-size: 12px" class="bg-success">هذا المنتج
+                                    تم جرده من قبل , سيتم تحديث الجرد</span>
+                            </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="exampleInputEmail1">الفارق</label>
-                                <input readonly type="text" class="form-control" id="different-quantity"
-                                    aria-describedby="emailHelp" placeholder=". . .">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">الفارق</label>
+                                    <input readonly type="text" class="form-control" id="different-quantity"
+                                        aria-describedby="emailHelp" placeholder=". . .">
+                                </div>
+                            </div>
+                            <div style="margin-top: 24px" class="col-md-6">
+                                <div class="form-group">
+                                    <button type="button" id="save" class="btn btn-primary inventoryAction">
+                                        <i style="margin-left: 5px" class="fa fas fa-file-invoice"></i>جرد
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <div style="margin-top: 24px" class="col-md-6">
-                            <div class="form-group">
-                                <button type="button" id="save" class="btn btn-primary inventoryAction">
-                                    <i style="margin-left: 5px" class="fa fas fa-file-invoice"></i>جرد
-                                </button>
-                            </div>
-                        </div>
-                    </div>
 
-                    <br>
-                    <br>
+                        <br>
+                        <br>
 
-                    @if (!empty(session()->get('inventory')))
+                        @if (!empty(session()->get('inventory')))
 
-                        <table id="inventories-table" style="width: 80%" class="table text-center">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">إسم المنتج</th>
-                                    <th scope="col">الكمية الحالية</th>
-                                    <th scope="col">الكمية الموجودة</th>
-                                    <th scope="col">الفارق</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventories-items">
-
-                                @foreach ($session_inventories as $inventory)
-                                    <tr id="inventories-item">
-                                        <th scope="row">{{ $loop->iteration++ }}</th>
-                                        <td>{{ $inventory['product_name'] }}</td>
-                                        <td>{{ $inventory['current_quantity'] }}</td>
-                                        <td>{{ $inventory['finded_quantity'] }}</td>
-
-                                        <td>
-                                            {{ $inventory['difference_quantity'] }}
-
-                                        </td>
+                            <table id="inventories-table" style="width: 80%" class="table text-center">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">إسم المنتج</th>
+                                        <th scope="col">الكمية الحالية</th>
+                                        <th scope="col">الكمية الموجودة</th>
+                                        <th scope="col">الفارق</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @endif
+                                </thead>
+                                <tbody id="inventories-items">
+
+                                    @foreach ($session_inventories as $inventory)
+                                        <tr id="inventories-item">
+                                            <th scope="row">{{ $loop->iteration++ }}</th>
+                                            <td>{{ $inventory['product_name'] }}</td>
+                                            <td>{{ $inventory['current_quantity'] }}</td>
+                                            <td>{{ $inventory['finded_quantity'] }}</td>
+
+                                            <td>
+                                                {{ $inventory['difference_quantity'] }}
+
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
 
 
                 </form>
@@ -187,15 +202,26 @@
                                     'id': $(this).attr('name'),
                                 },
                                 success: function(data) {
+
+
                                     $("#product-id").val(data.id);
                                     $("#product-name").val(data.name);
-                                    $("#current-quantity").val(data.alert_quantity);
+                                    $("#current-quantity").val(data.purchase_lines[
+                                        0].quantity);
 
                                     $('.list-group').empty();
                                     $('.list-group').css('display', 'none');
                                     $('#search-product').val('');
                                     $('#finded-quantity').val('');
                                     $('#different-quantity').val('');
+
+                                    if (data.inventory) {
+                                        $('#is-inventory-exist').css('visibility',
+                                            'visible');
+                                    } else {
+                                        $('#is-inventory-exist').css('visibility',
+                                            'hidden');
+                                    }
 
 
                                 },
@@ -305,19 +331,26 @@
         $('#store-inventories').on('click', function() {
 
             $.ajax({
-                type: 'post',
-                enctype: 'multipart/form-data',
-                url: "{{ route('inventory-store') }}",
-                data: {
-                    '': '',
-                },
-                success: function(data) {
-                    $("#inventories-table").css('visibility', 'hidden');
-                    $("#remove-inventories").prop("disabled", true);
-                    $("#store-inventories").prop("disabled", true);
+                    type: 'post',
+                    enctype: 'multipart/form-data',
+                    url: "{{ route('inventory-store') }}",
+                    data: {
+                        '': '',
+                    },
+                    success: function(data) {
+                        $("#inventories-table").css('visibility', 'hidden');
+                        $("#remove-inventories").prop("disabled", true);
+                        $("#store-inventories").prop("disabled", true);
 
-                },
-                error: function(reject) {}
+
+
+                    },
+                    error: function(reject) {}
+
+                    location.reload();
+
+                }, error: function(reject) {}
+
             });
 
 

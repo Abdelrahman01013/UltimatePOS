@@ -19,6 +19,7 @@ use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 use Spatie\Activitylog\Models\Activity;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 
 
@@ -112,9 +113,31 @@ class InventoryController extends Controller
     {
 
         $session_inventories = session()->get('inventory');
+
+        $last_dates = Inventory::select(DB::raw('MAX(created_at) as last_created'), DB::raw('MAX(updated_at) as last_updated'))->first();
+        $last_inventory = [];
+
+        if ($last_dates->last_created != null && $last_dates->last_updated != null) {
+
+            $last = max($last_dates->last_created, $last_dates->last_updated);
+
+
+            if ($last_dates->last_updated > $last_dates->last_created) {
+                $last_inventory = Inventory::with('product')->where('updated_at', $last)->get()->first();
+            } else {
+                $last_inventory = Inventory::with('product')->where('created_at', $last)->get()->first();
+            }
+
+            $last_inventory = [
+                'name' => $last_inventory->product->name,
+                'date' => $last
+            ];
+
+            return view('inventories.inventory-by-location', compact('session_inventories', 'last_inventory'));
+        }
+
         return view('inventories.inventory-by-location', compact('session_inventories'));
     }
-
 
 
     /**
@@ -149,16 +172,18 @@ class InventoryController extends Controller
             // ->whereRaw("SUBSTRING(name, 1, $search_word_length) = ?", $search_word)
             // ->get();
 
-            $products = Product::with('product_locations')
-                ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
-                ->where('location_id', $id)
-                ->where('products.name', 'LIKE', '%' . $search_word . '%')
-                ->select('id', 'name')
-                ->get();
+            if ($search_word) {
+                $products = Product::with('product_locations')
+                    ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
+                    ->where('location_id', $id)
+                    ->where('products.name', 'LIKE', '%' . $search_word . '%')
+                    ->select('id', 'name')
+                    ->get();
 
 
-            return response()->json($products);
-        }
+                return response()->json($products);
+            }
+        };
     }
 
     public function getProducts(Request $request)
@@ -166,6 +191,11 @@ class InventoryController extends Controller
         $product = Product::find($request->id);
 
         $product = Product::with('product_locations')->find($request->id);
+
+        $product = Product::with('product_locations')
+            ->with('purchase_lines')
+            ->with('inventory')
+            ->find($request->id);
 
         return response()->json($product);
     }
@@ -213,11 +243,34 @@ class InventoryController extends Controller
                 "finded_quantity" => $inventory["finded_quantity"],
                 "difference_quantity" => $inventory["difference_quantity"],
             ]);
+            $location_id = substr(url()->previous(), -1);
+
+            foreach ($session_inventories as $inventory) {
+                $is_inventory_exist = Inventory::where('product_id', $inventory["product_id"])->get()->first();
+
+
+                if (empty($is_inventory_exist)) {
+                    Inventory::create([
+                        "product_id" => $inventory["product_id"],
+                        "location_id" => $location_id,
+                        "current_quantity" => $inventory["current_quantity"],
+                        "finded_quantity" => $inventory["finded_quantity"],
+                        "difference_quantity" => $inventory["difference_quantity"],
+                    ]);
+                } else {
+                    $is_inventory_exist->update([
+                        "product_id" => $inventory["product_id"],
+                        "location_id" => $location_id,
+                        "current_quantity" => $inventory["current_quantity"],
+                        "finded_quantity" => $inventory["finded_quantity"],
+                        "difference_quantity" => $inventory["difference_quantity"],
+                    ]);
+                }
+            }
+
+            session()->forget('inventory');
+            return response()->json('success');
         }
-
-        session()->forget('inventory');
-
-        return response()->json('success');
     }
 
 

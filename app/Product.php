@@ -66,6 +66,11 @@ class Product extends Model
     {
         return $this->belongsTo(\App\Brands::class);
     }
+
+    public function inventory() {
+        return $this->hasOne(\App\Inventory::class);
+    }
+
     
     /**
     * Get the unit associated with the product.
