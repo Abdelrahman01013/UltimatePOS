@@ -39,8 +39,14 @@
                             <div class="col-md-6">
                                 <label for="exampleInputEmail1">آخر منتج تم جرده</label>
                             <div class="input-group">
+                                @php
+                                    if(isset($last_inventory)) {
+                                        $last_inventory = $last_inventory['date'] .' / '. $last_inventory['name'];
+                                    }else
+                                        $last_inventory = '';
+                                @endphp
                                 <span class="input-group-addon" id="basic-addon1"><i class="fas fa-clock"></i></span>
-                                <input type="text" class="form-control" placeholder=". . ."  aria-describedby="basic-addon1">
+                                <input readonly value="{{$last_inventory}}" type="text" class="form-control" placeholder=". . ."  aria-describedby="basic-addon1">
                             </div>
                         </div>
                     </div>
@@ -60,7 +66,7 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label for="exampleInputEmail1">الكمية الحالية</label>
+                                <label for="exampleInputEmail1">الكمية الحالية ( المسجلة )</label>
                                 <input readonly type="number" class="form-control" id="current-quantity" aria-describedby="emailHelp" placeholder=". . .">
                             </div>
                         </div>
@@ -71,8 +77,8 @@
                             </div>
                         </div>
 
-                        <div style="margin-top: 30px" class="col-md-3">
-                            <span style="padding: 7px; border-radius: 5px" class="bg-success" >هذا المنتج تم جرده من قبل</span>
+                        <div id="is-inventory-exist" style="margin-top: 30px;visibility:hidden" class="col-md-3">
+                            <span style="padding: 7px; border-radius: 5px;font-size: 12px" class="bg-success" >هذا المنتج تم جرده من قبل , سيتم تحديث الجرد</span>
                         </div>
 
                         <div class="col-md-6">
@@ -172,9 +178,11 @@
                                     'id': $(this).attr('name'),
                                 },
                                 success: function(data) {
+
+
                                     $("#product-id").val(data.id);
                                     $("#product-name").val(data.name);
-                                    $("#current-quantity").val(data.alert_quantity);
+                                    $("#current-quantity").val(data.purchase_lines[0].quantity);
 
                                     $('.list-group').empty();
                                     $('.list-group').css('display', 'none');
@@ -182,6 +190,12 @@
                                     $('#finded-quantity').val('');
                                     $('#different-quantity').val('');
 
+                                    if(data.inventory) {
+                                        $('#is-inventory-exist').css('visibility', 'visible');
+                                    }else {
+                                        $('#is-inventory-exist').css('visibility', 'hidden');
+                                    }
+                                    
 
                                 }, error: function(reject) {
                                 }
@@ -293,6 +307,8 @@
                     $("#inventories-table").css('visibility', 'hidden');
                     $("#remove-inventories").prop("disabled", true);
                     $("#store-inventories").prop("disabled", true);
+
+                    location.reload();
 
                 }, error: function(reject) {}
             });
