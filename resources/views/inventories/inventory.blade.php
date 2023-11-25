@@ -11,9 +11,9 @@
             <small>@lang('التقارير')</small>
         </h1>
         <!-- <ol class="breadcrumb">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li class="active">Here</li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ol> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <li class="active">Here</li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </ol> -->
     </section>
 
     <!-- Main content -->
@@ -35,8 +35,8 @@
                                 <th>الكميه في المخز</th>
 
                                 <th>الفارق</th>
-                                <th>الكميه الان</th>
-                                <th>وقت الجرد</th>
+
+                                <th>تاريخ الجرد</th>
                                 <th>@lang('messages.action')</th>
                             </tr>
                         </thead>
@@ -58,7 +58,7 @@
 
 
 
-                                <th> {{ $inv->product->alert_quantity }}</th>
+                                {{-- <th> {{ $inv->product->alert_quantity }}</th> --}}
 
                                 <th> {{ $inv->created_at }}</th>
                                 <th>
@@ -71,7 +71,7 @@
 
                                         <button class="btn btn-primary"
                                             onclick='return confirm("هل انت متاكد من عدم جرد " + "{{ $inv->product->name }}" + "?")'>
-                                            عدم الجرد
+                                            الغاء الجرد
                                         </button>
                                     </form>
                                 </th>
