@@ -204,10 +204,9 @@
                                 success: function(data) {
 
 
-                                    $("#product-id").val(data.id);
-                                    $("#product-name").val(data.name);
-                                    $("#current-quantity").val(data.purchase_lines[
-                                        0].quantity);
+                                    $("#product-id").val(data.product.id);
+                                    $("#product-name").val(data.product.name);
+                                    $("#current-quantity").val(data.quantity);
 
                                     $('.list-group').empty();
                                     $('.list-group').css('display', 'none');
@@ -331,27 +330,21 @@
         $('#store-inventories').on('click', function() {
 
             $.ajax({
-                    type: 'post',
-                    enctype: 'multipart/form-data',
-                    url: "{{ route('inventory-store') }}",
-                    data: {
-                        '': '',
-                    },
-                    success: function(data) {
-                        $("#inventories-table").css('visibility', 'hidden');
-                        $("#remove-inventories").prop("disabled", true);
-                        $("#store-inventories").prop("disabled", true);
+                type: 'post',
+                enctype: 'multipart/form-data',
+                url: "{{ route('inventory-store') }}",
+                data: {
+                    '': '',
+                },
+                success: function(data) {
+                    $("#inventories-table").css('visibility', 'hidden');
+                    $("#remove-inventories").prop("disabled", true);
+                    $("#store-inventories").prop("disabled", true);
 
+                    location.reload();
 
-                        location.reload();
-                    },
-
-                    error: function(reject) {}
-
-
-
-                }, error: function(reject) {}
-
+                },
+                error: function(reject) {}
             });
 
 

@@ -188,16 +188,25 @@ class InventoryController extends Controller
 
     public function getProducts(Request $request)
     {
-        $product = Product::find($request->id);
-
-        $product = Product::with('product_locations')->find($request->id);
-
         $product = Product::with('product_locations')
-            ->with('purchase_lines')
             ->with('inventory')
             ->find($request->id);
 
-        return response()->json($product);
+        $product_purchase_lines = Product::with('purchase_lines')->find($request->id);
+        $product_purchase_lines = $product_purchase_lines->purchase_lines;
+        $quantity = 0;
+
+        if (!empty($product_purchase_lines)) {
+            foreach ($product_purchase_lines as $product_purchase_line) {
+                $quantity += $product_purchase_line->quantity;
+            }
+        }
+
+
+        return response()->json([
+            'product' => $product,
+            'quantity' => $quantity,
+        ]);
     }
 
 
