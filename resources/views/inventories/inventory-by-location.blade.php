@@ -343,11 +343,12 @@
                         $("#store-inventories").prop("disabled", true);
 
 
-
+                        location.reload();
                     },
+
                     error: function(reject) {}
 
-                    location.reload();
+
 
                 }, error: function(reject) {}
 
