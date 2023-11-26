@@ -89,7 +89,7 @@
                         </div>
                         <div style="margin-top: 24px" class="col-md-6">
                             <div class="form-group">
-                                <button type="button" id="save" class="btn btn-primary inventoryAction" >
+                                <button disabled type="button" id="save" class="btn btn-primary inventoryAction" >
                                     <i style="margin-left: 5px" class="fa fas fa-file-invoice" ></i>جرد
                                 </button>
                             </div>
@@ -164,10 +164,23 @@
                     },
                     success: function(data) {
                         $('.list-group').empty();
-                        $.each(data, function( index, value ) {
-                            var item = "<a name="+value.id+" class=\"list-group-item list-group-item-action\">"+value.name+"</a>";
-                            $('.list-group').append(item);
-                        });
+
+
+                        if(data.search_by == 'name') {
+                            $.each(data.products, function( index, value ) {
+                                var item = "<a name="+value.id+" class=\"list-group-item list-group-item-action\">"+value.name+"</a>";
+                                $('.list-group').append(item);
+                            });
+                        }
+                        
+                        if(data.search_by == 'sku') {
+                            $.each(data.products, function( index, value ) {
+                                var item = "<a name="+value.id+" class=\"list-group-item list-group-item-action\">"+value.sku+"</a>";
+                                console.log(item);
+                                $('.list-group').append(item);
+                            });
+                        }
+
                         $('.list-group-item').on('click', function() {
                         
                             $.ajax({
@@ -179,7 +192,7 @@
                                 },
                                 success: function(data) {
                                     
-
+                                    $("#save").prop("disabled", false);
                                     $("#product-id").val(data.product.id);
                                     $("#product-name").val(data.product.name);
                                     $("#current-quantity").val(data.quantity);
@@ -190,7 +203,7 @@
                                     $('#finded-quantity').val('');
                                     $('#different-quantity').val('');
 
-                                    if(data.inventory) {
+                                    if(data.product.inventory) {
                                         $('#is-inventory-exist').css('visibility', 'visible');
                                     }else {
                                         $('#is-inventory-exist').css('visibility', 'hidden');
@@ -232,7 +245,7 @@
 
         $('.inventoryAction').on('click', function() {
             
-            if($("#product-name").val() != '') {
+            if($("#product-name").val() != '' && $("#finded-quantity").val()) {
                 $.ajax({
                     type: 'post',
                     enctype: 'multipart/form-data',

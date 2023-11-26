@@ -127,15 +127,45 @@ class InventoryController extends Controller
         $id = substr(url()->previous(), -1);
 
         if($search_word) {
-            $products = Product::with('product_locations')
+
+            $search_by = '';
+            
+            $products_by_name = Product::with('product_locations')
             ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
             ->where('location_id', $id)
             ->where('products.name', 'LIKE', '%'. $search_word. '%')
             ->select('id', 'name')
             ->get();
 
+            $products_by_sku = Product::with('product_locations')
+            ->join('product_locations', 'products.id', '=', 'product_locations.product_id')
+            ->where('location_id', $id)
+            ->where('products.sku', 'LIKE', '%'. $search_word. '%')
+            ->select('id', 'name', 'sku')
+            ->get();
 
-            return response()->json($products);
+
+            if(isset($products_by_sku[0]))
+                $search_by =  'sku';
+            if(isset($products_by_name[0]))
+                $search_by =  'name';
+
+            if($search_by == 'name') {
+                return response()->json([
+                    'products'=>$products_by_name,
+                    'search_by'=>'name'
+                ]);
+            }
+
+            if($search_by == 'sku') {
+                return response()->json([
+                    'products'=>$products_by_sku,
+                    'search_by'=>'sku'
+                ]);
+            }
+
+            return 'success';
+            
         }
         
     }
